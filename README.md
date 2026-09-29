@@ -1,6 +1,6 @@
 # Shaarli Newsletter
 
-Génère et envoie chaque matin une newsletter avec les liens partagés la veille sur votre instance Shaarli. L’interface d’administration permet de configurer la source, l’envoi, la planification et l’apparence.
+Générez et envoyez chaque matin une newsletter à partir des liens partagés la veille sur votre instance Shaarli. Configurez la source, les envois, la météo et l’apparence depuis une interface web protégée, avec six palettes et trois mises en page.
 
 ## Fonctionnalités
 
@@ -13,8 +13,8 @@ Génère et envoie chaque matin une newsletter avec les liens partagés la veill
 ## Installation
 
 ```bash
-git clone https://github.com/VOTRE_USER/shaarli-newsletter.git
-cd shaarli-newsletter
+git clone https://github.com/ludovicmorisset/newsletter.git
+cd newsletter
 cp env.example .env
 ```
 

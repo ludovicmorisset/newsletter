@@ -4,6 +4,159 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Ma veille du {{ date.strftime('%d/%m/%Y') }}</title>
+<style>
+  @media only screen and (max-width: 620px) {
+    .newsletter-shell { width: 100% !important; }
+  .mobile-column { display: block !important; width: 100% !important; max-width: 100% !important; }
+  .column-pad { padding-left: 20px !important; padding-right: 20px !important; }
+  .masthead-title { font-size: 42px !important; }
+    .lead-title { font-size: 27px !important; }
+  }
+</style>
+</head>
+<body style="margin:0; padding:0; background:{{ theme.bg }}; color:{{ theme.text }}; font-family:{{ theme.font }};">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:{{ theme.bg }}; padding:28px 10px;">
+    <tr>
+      <td align="center">
+        <table role="presentation" class="newsletter-shell" width="720" cellpadding="0" cellspacing="0" style="width:100%; max-width:720px; background:{{ theme.card_bg }}; border-radius:4px; overflow:hidden;">
+          <tr>
+            <td class="column-pad" style="padding:16px 28px 10px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-top:3px solid {{ theme.text }}; border-bottom:1px solid {{ theme.text }};">
+                <tr>
+                  <td style="padding:7px 0; color:{{ theme.muted }}; font-family:Arial, sans-serif; font-size:9px; text-transform:uppercase;">Le quotidien personnel</td>
+                  <td align="right" style="padding:7px 0; color:{{ theme.muted }}; font-family:Arial, sans-serif; font-size:9px; text-transform:uppercase;">Les liens de votre Shaarli</td>
+                </tr>
+                <tr>
+                  <td colspan="2" align="center" style="padding:1px 0 7px; border-bottom:1px solid {{ theme.text }};">
+                    <div class="masthead-title" style="color:{{ theme.text }}; font-family:{{ theme.font }}; font-size:48px; font-weight:bold; line-height:1;">Shaarli <span style="color:{{ theme.accent }}; font-style:italic; font-weight:normal;">Matin</span></div>
+                    <div style="margin-top:5px; color:{{ theme.muted }}; font-family:Georgia, 'Times New Roman', serif; font-size:11px; font-style:italic;">{% if theme.layout == 'digest' %}Les idées essentielles, en quelques minutes.{% elif theme.layout == 'focus' %}Un lien à retenir, puis le reste de votre veille.{% else %}Un matin informé, sans commencer par défiler.{% endif %}</div>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding:7px 0 2px; color:{{ theme.text }}; font-family:Arial, sans-serif; font-size:9px; text-transform:uppercase;">Édition quotidienne</td>
+                  <td align="right" style="padding:7px 0 2px; color:{{ theme.text }}; font-family:Arial, sans-serif; font-size:9px; font-weight:bold; text-transform:uppercase;">{{ date.strftime('%d/%m/%Y') }}</td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <tr>
+            <td class="column-pad" style="padding:18px 28px 30px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td class="mobile-column" width="205" valign="top" style="width:205px; border-right:1px solid {{ theme.text }};">
+                    <div style="padding:0 18px 12px 0;">
+                      {% if weather %}
+                      <div style="padding-bottom:11px; border-bottom:1px solid {{ theme.bg }};">
+                        <div style="color:{{ theme.muted }}; font-family:Arial, sans-serif; font-size:9px; text-transform:uppercase;">{{ weather_label or 'Météo du jour' }}</div>
+                        <div style="margin-top:5px; color:{{ theme.text }}; font-family:{{ theme.font }}; font-size:27px; font-weight:bold; line-height:1.2;">{{ weather.icon }} {{ weather.tmax }}°</div>
+                        <div style="color:{{ theme.muted }}; font-family:Arial, sans-serif; font-size:10px;">Minimum {{ weather.tmin }}° · maximum {{ weather.tmax }}°</div>
+                      </div>
+                      {% endif %}
+
+                      <div style="padding:12px 0; border-bottom:1px solid {{ theme.text }};">
+                        {% if preview_error %}
+                        <div style="margin-bottom:7px; color:{{ theme.muted }}; font-family:Arial, sans-serif; font-size:9px; text-transform:uppercase;">État de la source</div>
+                        <div style="color:#ba1a1a; font-family:{{ theme.font }}; font-size:17px; font-weight:bold;">Indisponible</div>
+                        {% else %}
+                        <div style="margin-bottom:7px; color:{{ theme.muted }}; font-family:Arial, sans-serif; font-size:9px; text-transform:uppercase;">Dans cette édition</div>
+                        <div style="color:{{ theme.text }}; font-family:{{ theme.font }}; font-size:22px; font-weight:bold;">{{ links|length }} lien{% if links|length != 1 %}s{% endif %}</div>
+                        <div style="margin-top:3px; color:{{ theme.muted }}; font-size:11px;">partagé{% if links|length != 1 %}s{% endif %} hier</div>
+                        {% endif %}
+                      </div>
+
+                      {% set topic_state = namespace(tags=[]) %}
+                      {% for link in links %}
+                        {% for tag in link.tags or [] %}
+                          {% if tag not in topic_state.tags %}{% set _ = topic_state.tags.append(tag) %}{% endif %}
+                        {% endfor %}
+                      {% endfor %}
+                      {% if topic_state.tags %}
+                      <div style="padding:12px 0;">
+                        <div style="margin-bottom:7px; color:{{ theme.muted }}; font-family:Arial, sans-serif; font-size:9px; text-transform:uppercase;">Sujets suivis</div>
+                        {% for tag in topic_state.tags[:8] %}
+                        <div style="padding:5px 0; border-bottom:1px solid {{ theme.bg }}; color:{{ theme.text }}; font-size:11px;"># {{ tag }}</div>
+                        {% endfor %}
+                      </div>
+                      {% endif %}
+
+                      <div style="padding:11px 0; border-top:1px solid {{ theme.text }}; color:{{ theme.muted }}; font-family:Georgia, 'Times New Roman', serif; font-size:11px; font-style:italic; line-height:1.45;">
+                        {% if theme.layout == 'digest' %}Une sélection courte pour aller droit aux idées.{% elif theme.layout == 'focus' %}Commencez par le lien qui ouvre la journée.{% else %}Votre veille, rangée pour une lecture au calme.{% endif %}
+                      </div>
+                    </div>
+                  </td>
+
+                  <td class="mobile-column column-pad" valign="top" style="padding-left:20px;">
+                    {% if preview_error %}
+                    <div style="padding:14px 16px; border-left:3px solid #ba1a1a; background:#fff0ef; color:#641313;">
+                      <strong style="font-family:Arial, sans-serif; font-size:14px;">Impossible de charger l’aperçu Shaarli</strong>
+                      <p style="margin:7px 0 0; font-family:Arial, sans-serif; font-size:13px; line-height:1.55;">{{ preview_error }}</p>
+                    </div>
+                    {% elif links %}
+                      {% set lead = links[-1] %}
+                      <div style="padding:0 0 12px; border-bottom:2px solid {{ theme.text }};">
+                        <div style="margin:0 0 7px; color:{{ theme.muted }}; font-family:Arial, sans-serif; font-size:9px; text-transform:uppercase;">À retenir / Source Shaarli / Édition du {{ date.strftime('%d/%m') }}</div>
+                        <h1 class="lead-title" style="margin:0; color:{{ theme.text }}; font-family:{{ theme.font }}; font-size:{% if theme.layout == 'focus' %}31px{% else %}28px{% endif %}; line-height:1.04;">{{ lead.title or lead.url }}</h1>
+                        {% if show_descriptions and lead.description %}
+                        <p style="margin:9px 0 0; color:{{ theme.text }}; font-family:{{ theme.font }}; font-size:13px; line-height:1.5;">{{ lead.description }}</p>
+                        {% endif %}
+                        <a href="{{ lead.url }}" style="display:inline-block; margin-top:10px; padding:8px 13px; border-radius:3px; background:{{ theme.accent }}; color:#ffffff; font-family:Arial, sans-serif; font-size:11px; font-weight:bold; text-decoration:none;">Lire le lien&nbsp; →</a>
+                      </div>
+
+                      {% if links|length > 1 %}
+                      <div style="padding-top:11px;">
+                        <h2 style="margin:0 0 7px; color:{{ theme.text }}; font-family:{{ theme.font }}; font-size:17px;">En bref</h2>
+                        {% for link in links[:-1]|reverse %}
+                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-bottom:1px solid {{ theme.bg }};">
+                          <tr>
+                            <td width="30" valign="top" style="width:30px; padding:9px 5px 9px 0; color:{{ theme.accent }}; font-family:Arial, sans-serif; font-size:10px; font-weight:bold;">{{ '%02d'|format(loop.index + 1) }}</td>
+                            <td valign="top" style="padding:9px 0;">
+                              <a href="{{ link.url }}" style="color:{{ theme.text }}; font-family:{{ theme.font }}; font-size:14px; font-weight:bold; line-height:1.3; text-decoration:none;">{{ link.title or link.url }}</a>
+                              {% if show_descriptions and link.description %}<div style="margin-top:4px; color:{{ theme.muted }}; font-family:{{ theme.font }}; font-size:11px; line-height:1.4;">{{ link.description }}</div>{% endif %}
+                              {% if link.tags %}<div style="margin-top:4px; color:{{ theme.accent }}; font-family:Arial, sans-serif; font-size:9px;">{% for tag in link.tags %}#{{ tag }}{% if not loop.last %}&nbsp;&nbsp;{% endif %}{% endfor %}</div>{% endif %}
+                            </td>
+                          </tr>
+                        </table>
+                        {% endfor %}
+                      </div>
+                      {% endif %}
+                    {% else %}
+                    <div style="padding:4px 0 18px; border-bottom:2px solid {{ theme.text }};">
+                      <div style="margin-bottom:8px; color:{{ theme.muted }}; font-family:Arial, sans-serif; font-size:9px; text-transform:uppercase;">Édition du {{ date.strftime('%d/%m/%Y') }}</div>
+                      <h1 style="margin:0; color:{{ theme.text }}; font-family:{{ theme.font }}; font-size:27px; line-height:1.1;">Une page calme pour commencer la journée</h1>
+                      <p style="margin:9px 0 0; color:{{ theme.muted }}; font-size:13px; line-height:1.5;">Aucun lien n’a été partagé hier. Votre prochaine sélection apparaîtra ici.</p>
+                    </div>
+                    {% endif %}
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td class="column-pad" style="padding:10px 28px 14px; border-top:2px solid {{ theme.text }}; border-bottom:1px solid {{ theme.text }};">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td style="padding:5px 10px 5px 0; color:{{ theme.muted }}; font-family:Arial, sans-serif; font-size:9px; text-transform:uppercase;">Votre veille personnelle</td>
+                  <td align="right" style="padding:5px 0 5px 10px; color:{{ theme.muted }}; font-family:Arial, sans-serif; font-size:9px;">Générée depuis votre instance Shaarli</td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td class="column-pad" style="padding:8px 28px 0; color:{{ theme.muted }}; font-family:Arial, sans-serif; font-size:8px; text-transform:uppercase;">Shaarli Newsletter</td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ma veille du {{ date.strftime('%d/%m/%Y') }}</title>
 </head>
 <body style="margin:0; padding:0; background:{{ theme.bg }}; font-family:{{ theme.font }};">
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:{{ theme.bg }}; padding:32px 12px;">
