@@ -5,7 +5,7 @@ Génère et envoie chaque matin une newsletter avec les liens partagés la veill
 ## Fonctionnalités
 
 - Interface d’administration avec page de connexion et session sécurisée
-- Cinq thèmes graphiques pour la newsletter
+- Six palettes (couleurs et polices) associées à trois compositions : éditoriale, liste numérotée ou lien à la une
 - Météo du jour via Open-Meteo, sans clé API
 - Aperçu de la newsletter et envoi manuel
 - Envoi automatique avec planificateur intégré
@@ -29,3 +29,5 @@ Ouvrez `http://votre-vps:8080/login` ou configurez un reverse proxy HTTPS avant 
 ## Configuration Shaarli
 
 Dans Shaarli, ouvrez **Réglages > Configuration > API REST**, copiez le secret généré et renseignez-le dans l’interface d’administration.
+
+L’URL de Shaarli doit inclure `http://` ou `https://` et désigner la racine de l’instance, sans ajouter `/api/v1/links`. Si Shaarli tourne aussi dans Docker, `localhost` depuis Newsletter désigne le conteneur Newsletter : utilisez le nom du service Shaarli et partagez un réseau Docker entre les deux services.

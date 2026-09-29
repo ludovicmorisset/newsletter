@@ -1,6 +1,8 @@
 THEMES = {
     "journal": {
         "label": "Journal (classique)",
+        "layout": "editorial",
+        "layout_label": "Lecture éditoriale",
         "font": "Georgia, 'Times New Roman', serif",
         "bg": "#f4f1ea",
         "card_bg": "#ffffff",
@@ -10,6 +12,8 @@ THEMES = {
     },
     "moderne": {
         "label": "Moderne (sans-serif)",
+        "layout": "digest",
+        "layout_label": "Liste numérotée",
         "font": "'Segoe UI', Helvetica, Arial, sans-serif",
         "bg": "#f5f7fa",
         "card_bg": "#ffffff",
@@ -19,6 +23,8 @@ THEMES = {
     },
     "dark": {
         "label": "Sombre",
+        "layout": "focus",
+        "layout_label": "Lien à la une",
         "font": "'Segoe UI', Helvetica, Arial, sans-serif",
         "bg": "#121212",
         "card_bg": "#1e1e1e",
@@ -28,6 +34,8 @@ THEMES = {
     },
     "nature": {
         "label": "Nature",
+        "layout": "digest",
+        "layout_label": "Liste numérotée",
         "font": "'Trebuchet MS', Verdana, sans-serif",
         "bg": "#f1f8f1",
         "card_bg": "#ffffff",
@@ -37,6 +45,8 @@ THEMES = {
     },
     "pastel": {
         "label": "Pastel",
+        "layout": "editorial",
+        "layout_label": "Lecture éditoriale",
         "font": "'Poppins', 'Segoe UI', sans-serif",
         "bg": "#fdf2f8",
         "card_bg": "#ffffff",
@@ -46,6 +56,8 @@ THEMES = {
     },
     "mono": {
         "label": "Minimaliste mono",
+        "layout": "focus",
+        "layout_label": "Lien à la une",
         "font": "'Courier New', Courier, monospace",
         "bg": "#ffffff",
         "card_bg": "#fafafa",

@@ -85,6 +85,7 @@
   .theme-option input { position: absolute; opacity: 0; }
   .swatch { height: 24px; margin-bottom: 8px; border-radius: 4px; }
   .theme-name { font-size: 13px; font-weight: 600; overflow-wrap: anywhere; }
+  .theme-layout { min-height: 28px; margin-top: 4px; color: var(--muted); font-size: 11px; line-height: 1.35; }
   .actions { position: sticky; bottom: 0; z-index: 2; display: flex; flex-wrap: wrap; gap: 10px; margin-top: 4px; padding: 14px 0; background: linear-gradient(0deg, var(--surface-low) 78%, #f3f7f500); }
   .button { min-height: 44px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 0 18px; border: 0; border-radius: 22px; background: var(--primary); color: var(--on-primary); font-size: 14px; font-weight: 700; cursor: pointer; transition: background .15s, box-shadow .15s; }
   .button:hover { background: var(--primary-hover); box-shadow: 0 2px 5px #0002; }
@@ -194,6 +195,7 @@
               <input type="radio" name="theme" value="{{ key }}" {% if s.theme == key %}checked{% endif %}>
               <div class="swatch" style="background:{{ t.accent }};"></div>
               <div class="theme-name" style="font-family:{{ t.font }}">{{ t.label }}</div>
+              <div class="theme-layout">{{ t.layout_label }}</div>
             </label>
             {% endfor %}
           </div>

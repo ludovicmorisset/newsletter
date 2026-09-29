@@ -2,6 +2,7 @@ import os
 import secrets
 from datetime import datetime
 
+import httpx
 from fastapi import FastAPI, Request, Form
 from fastapi.responses import HTMLResponse, RedirectResponse
 from jinja2 import Environment, FileSystemLoader, select_autoescape
@@ -214,5 +215,44 @@ def admin_preview(request: Request, theme: str = "journal"):
         return RedirectResponse("/login", status_code=303)
     settings = load_settings()
     settings.theme = theme
-    html, _, _ = build_newsletter_html(settings)
-    return html
+    try:
+        html, _, _ = build_newsletter_html(settings)
+        return html
+    except httpx.HTTPStatusError as error:
+        status_code = error.response.status_code
+        if status_code in (401, 403):
+            message = "Shaarli refuse l’accès à l’API. Vérifiez le secret API et l’activation de l’API REST."
+        elif status_code == 404:
+            message = "L’API Shaarli est introuvable. Vérifiez l’URL de base de l’instance, sans ajouter /api/v1/links."
+        else:
+            message = f"Shaarli a répondu avec le statut HTTP {status_code}."
+            response_detail = error.response.text.strip()[:240]
+            if response_detail:
+                message += f" Réponse : {response_detail}"
+        return render_preview_error(settings, message)
+    except httpx.InvalidURL:
+        return render_preview_error(settings, "L’URL Shaarli est invalide. Elle doit inclure le protocole, par exemple https://shaarli.example.org.")
+    except httpx.ConnectError as error:
+        return render_preview_error(
+            settings,
+            f"Shaarli est injoignable ({error}). Vérifiez l’URL et le réseau. Avec Docker, localhost désigne le conteneur Newsletter ; utilisez le nom du service Shaarli et un réseau Docker partagé.",
+        )
+    except httpx.TimeoutException:
+        return render_preview_error(settings, "La connexion à Shaarli a expiré. Vérifiez que l’instance est disponible et joignable depuis Newsletter.")
+    except httpx.RequestError as error:
+        return render_preview_error(settings, f"La requête vers Shaarli a échoué : {error}")
+    except (KeyError, TypeError, ValueError):
+        return render_preview_error(settings, "La réponse de l’API Shaarli n’a pas le format attendu. Vérifiez la version de Shaarli et son API REST.")
+
+
+def render_preview_error(settings: Settings, message: str) -> str:
+    template = env.get_template("newsletter.html")
+    return template.render(
+        theme=THEMES.get(settings.theme, THEMES["journal"]),
+        links=[],
+        date=datetime.now(),
+        show_descriptions=settings.show_descriptions,
+        weather=None,
+        weather_label=settings.weather_label,
+        preview_error=message,
+    )
