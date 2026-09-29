@@ -222,6 +222,9 @@ def admin_preview(request: Request, theme: str = "journal"):
         status_code = error.response.status_code
         if status_code in (401, 403):
             message = "Shaarli refuse l’accès à l’API. Vérifiez le secret API et l’activation de l’API REST."
+            response_detail = error.response.text.strip()[:240]
+            if response_detail:
+                message += f" Réponse Shaarli : {response_detail}"
         elif status_code == 404:
             message = "L’API Shaarli est introuvable. Vérifiez l’URL de base de l’instance, sans ajouter /api/v1/links."
         else:
