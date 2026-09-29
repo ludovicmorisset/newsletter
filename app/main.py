@@ -1,6 +1,7 @@
 import os
 import secrets
 from datetime import datetime
+from zoneinfo import ZoneInfo
 
 import httpx
 from fastapi import FastAPI, Request, Form
@@ -52,7 +53,7 @@ def valid_credentials(username: str, password: str) -> bool:
 
 def run_newsletter_job():
     settings = load_settings()
-    now_str = datetime.now().isoformat(timespec="seconds")
+    now_str = datetime.now(ZoneInfo(settings.timezone)).isoformat(timespec="seconds")
     try:
         html, links, yesterday = build_newsletter_html(settings)
         if not links and not settings.send_if_empty:
@@ -253,7 +254,7 @@ def render_preview_error(settings: Settings, message: str) -> str:
     return template.render(
         theme=THEMES.get(settings.theme, THEMES["journal"]),
         links=[],
-        date=datetime.now(),
+        date=datetime.now(ZoneInfo(settings.timezone)),
         show_descriptions=settings.show_descriptions,
         weather=None,
         weather_label=settings.weather_label,

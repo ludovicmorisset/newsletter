@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from themes import THEMES
 from shaarli_client import get_yesterday_links
@@ -8,12 +9,18 @@ env = Environment(loader=FileSystemLoader("templates"), autoescape=select_autoes
 
 
 def build_newsletter_html(settings) -> tuple[str, list[dict], datetime]:
-    yesterday = datetime.now() - timedelta(days=1)
+    timezone = ZoneInfo(settings.timezone)
+    yesterday = datetime.now(timezone) - timedelta(days=1)
 
     exclude_tags = [t.strip() for t in settings.exclude_tags.split(",") if t.strip()]
     links = []
     if settings.shaarli_url and settings.shaarli_api_secret:
-        links = get_yesterday_links(settings.shaarli_url, settings.shaarli_api_secret, exclude_tags)
+        links = get_yesterday_links(
+            settings.shaarli_url,
+            settings.shaarli_api_secret,
+            exclude_tags,
+            settings.timezone,
+        )
 
     weather = None
     if settings.weather_enabled and settings.weather_lat and settings.weather_lon:

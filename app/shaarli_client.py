@@ -2,6 +2,7 @@ import time
 import jwt
 import httpx
 from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
 
 
 def _make_token(secret: str) -> str:
@@ -9,14 +10,26 @@ def _make_token(secret: str) -> str:
     return jwt.encode(payload, secret, algorithm="HS256")
 
 
-def get_yesterday_links(shaarli_url: str, api_secret: str, exclude_tags: list[str] | None = None) -> list[dict]:
+def get_yesterday_links(
+    shaarli_url: str,
+    api_secret: str,
+    exclude_tags: list[str] | None = None,
+    timezone_name: str = "Europe/Paris",
+) -> list[dict]:
     """Récupère les liens créés hier (00:00 -> 23:59) via l'API Shaarli."""
     token = _make_token(api_secret)
     headers = {"Authorization": f"Bearer {token}"}
 
-    now = datetime.now()
-    yesterday_start = datetime(now.year, now.month, now.day) - timedelta(days=1)
-    yesterday_end = yesterday_start + timedelta(days=1)
+    timezone = ZoneInfo(timezone_name)
+    now = datetime.now(timezone)
+    yesterday_end = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    yesterday_start = yesterday_end - timedelta(days=1)
+
+    def parse_created(value: str) -> datetime:
+        created = datetime.fromisoformat(value.replace("Z", "+00:00"))
+        if created.tzinfo is None:
+            return created.replace(tzinfo=timezone)
+        return created.astimezone(timezone)
 
     links = []
     offset = 0
@@ -36,7 +49,7 @@ def get_yesterday_links(shaarli_url: str, api_secret: str, exclude_tags: list[st
 
             stop = False
             for link in batch:
-                created = datetime.fromisoformat(link["created"].replace("Z", "+00:00")).replace(tzinfo=None)
+                created = parse_created(link["created"])
                 if created >= yesterday_end:
                     continue
                 if created < yesterday_start:
@@ -52,5 +65,5 @@ def get_yesterday_links(shaarli_url: str, api_secret: str, exclude_tags: list[st
                 break
             offset += limit
 
-    links.sort(key=lambda l: l["created"])
+    links.sort(key=lambda link: parse_created(link["created"]))
     return links
